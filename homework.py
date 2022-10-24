@@ -1,23 +1,23 @@
+from dataclasses import asdict, dataclass
+
+
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
+
+    message = ('Тип тренировки: {}; '
+               'Длительность: {:.3f} ч.; '
+               'Дистанция: {:.3f} км; '
+               'Ср. скорость: {:.3f} км/ч; '
+               'Потрачено ккал: {:.3f}.')
 
     def get_message(self) -> str:
-        return (f'Тип тренировки: {self.training_type}; '
-                f'Длительность: {self.duration:.3f} ч.; '
-                f'Дистанция: {self.distance:.3f} км; '
-                f'Ср. скорость: {self.speed:.3f} км/ч; '
-                f'Потрачено ккал: {self.calories:.3f}.')
+        return self.message.format(*asdict(self).values())
 
 
 class Training:
@@ -120,14 +120,14 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    training_code = {
+    training_code: dict[str, Training] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
     }
     if workout_type in training_code:
         return training_code[workout_type](*data)
-    return None
+    raise ValueError('Неизвестный тип треннировки')
 
 
 def main(training: Training) -> None:
